@@ -228,28 +228,6 @@ Update this checklist according to the final implementation and test results.
 - [ ] At least five backend logic tests confirmed passing.
 - [ ] Production deployment smoke-tested, if a live demo is provided.
 
-## Screenshots
-
-Add screenshots of the actual application to a `screenshots/` directory and update the paths below.
-
-### Customer Dashboard
-
-![Customer Dashboard](screenshots/customer-dashboard.png)
-
-### Ticket Details
-
-![Ticket Details](screenshots/ticket-details.png)
-
-### Agent Dashboard
-
-![Agent Dashboard](screenshots/agent-dashboard.png)
-
-### AI-Assisted Reply
-
-![AI-Assisted Reply](screenshots/ai-reply-draft.png)
-
-Add the corresponding screenshot files before committing this section. Remove any screenshot references that do not correspond to real files.
-
 ## Limitations and Future Improvements
 
 With more time, the following improvements could be added:
@@ -287,7 +265,6 @@ If you deploy the application, replace this section with the actual public demo 
 - [ ] Verify internal-note privacy and server-side authorization.
 - [ ] Test SLA behavior and AI fallback.
 - [ ] Ensure `.env` files and secrets are excluded from Git.
-- [ ] Add real application screenshots.
 - [ ] Review the README for accuracy.
 - [ ] Confirm the GitHub repository is public.
 - [ ] Maintain meaningful commits as development progresses.
