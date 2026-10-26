@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  AGENT
+  ADMIN
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Category {
+  BILLING
+  TECHNICAL
+  ACCOUNT
+  PRODUCT
+  FEEDBACK
+  OTHER
+}
+
+model User {
+  id           String          @id @default(cuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         Role            @default(CUSTOMER)
+  active       Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  tickets      Ticket[]        @relation("CustomerTickets")
+  assignments  Ticket[]        @relation("AgentTickets")
+  messages     TicketMessage[]
+  auditLogs    AiActivity[]
+}
+
+model Ticket {
+  id                    String          @id @default(cuid())
+  subject               String
+  description           String
+  category              Category        @default(OTHER)
+  priority              Priority        @default(MEDIUM)
+  status                TicketStatus    @default(OPEN)
+  customerId            String
+  assignedAgentId       String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  firstResponseDeadline DateTime
+  firstResponseAt       DateTime?
+  customer              User            @relation("CustomerTickets", fields: [customerId], references: [id])
+  assignedAgent         User?           @relation("AgentTickets", fields: [assignedAgentId], references: [id])
+  messages              TicketMessage[]
+  aiActivities          AiActivity[]
+
+  @@index([customerId, updatedAt])
+  @@index([assignedAgentId, status, updatedAt])
+  @@index([firstResponseDeadline, firstResponseAt])
+}
+
+model TicketMessage {
+  id         String   @id @default(cuid())
+  ticketId   String
+  authorId   String
+  content    String
+  isInternal Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author     User     @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId, createdAt])
+}
+
+model AiActivity {
+  id         String   @id @default(cuid())
+  ticketId   String?
+  userId     String
+  kind       String
+  status     String
+  outputJson String?
+  createdAt  DateTime @default(now())
+  ticket     Ticket?  @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model RoundRobinState {
+  id          String   @id @default("global")
+  lastAgentId String?
+  updatedAt   DateTime @updatedAt
+}
